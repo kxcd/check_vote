@@ -81,7 +81,10 @@ for prop_hash in $(for key in "${!PROPOSALS[@]}"; do echo "$key ${PROPOSALS[$key
 		row+=" "
 	done
 
+	count=0
 	for collateral in "${COLLATERALS[@]}";do
+		# Can't use ((count++)) because it returns false to the shell.
+		let count=count+1
 		#echo "prop_hash: $prop_hash collateral: $collateral split: $(sed 's/-/ /' <<<"$collateral")"
 		vote=$(dash-cli gobject getcurrentvotes "$prop_hash" ${collateral//-/ }|awk -F ':' '/funding/{print substr($4,1,1)}')
 		((${#vote}==0))&&vote=" "
@@ -98,6 +101,7 @@ for prop_hash in $(for key in "${!PROPOSALS[@]}"; do echo "$key ${PROPOSALS[$key
 			*)
 				;;
 		esac
+		((count>10))&&row+=" "
 		row+="  $vote"
 	done
 	echo -e "$row"
@@ -105,6 +109,8 @@ done
 
 # Print the key.
 echo -e "\nLegend\n"
+padding=" "
 for((i=0;i<${#MASTERNODES[@]};i++));do
-    echo "$((i+1)) - ${MASTERNODES[$i]}"
+	((i==9))&&padding=
+	echo "$((i+1))${padding} - ${MASTERNODES[$i]}"
 done
