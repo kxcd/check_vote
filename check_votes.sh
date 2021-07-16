@@ -5,7 +5,6 @@ set -e
 # An array of protx hashes.
 MASTERNODES=(bc5ab1d9d0ef562563194b1eb594c248919d014b106b0d3759fc3fd577da2054 7166801342a2f09358ae4d3720f912c439605db9f58af362e9eccd44e8509fbb e8ce80ea903a5f4af70dfed189fbcf6926374743202c4cedafe58c21eafdc51b a569acf816ff49a72c18a62bdcc59bb95ed962c9c6ceae2fb4006e30d1946700 65650b10d273b74db238649477bc24222b4171cc1bbb8e0bd414d0eedee76f4f f134927ab6aeed105d1ac93ca3b9d2f197831abad91540e125aec03e8ae33437 7afd763df1b77ac1e9fa2a43d7387142fba5bb10e89462b16c9d1d14347d4c4c f1916d329797bb25ad4062e193473b9b48c344c10b48dc1bd5ee5ebb6b499a0a)
 
-
 txtred='\e[0;31m' # Red
 txtgrn='\e[0;32m' # Green
 txtylw='\e[0;33m' # Yellow
@@ -40,14 +39,13 @@ done
 declare -A PROPOSALS
 
 gobject=$(dash-cli gobject list)
-for hash in $(echo "$gobject"|grep -i -o '"[1234567890abcdef]*": {'|grep -i -o '[1234567890abcdef]*');do
-	proposalHash=$(jq -r ".\"$hash\".Hash"<<<"$gobject")
+for hash in $(jq -r '.[].Hash' <<<"$gobject");do
 	dataHex=$(jq -r ".\"$hash\".DataHex"<<<"$gobject")
 	dataString=$(dash-cli gobject deserialize "$dataHex")
 	objectType=$(jq -r '.type'<<<"$dataString")
-	if((objectType==2));then break;fi
+	if((objectType==2));then continue;fi
 	name=$(jq -r '.name'<<<"$dataString")
-	PROPOSALS[$proposalHash]="$name"
+	PROPOSALS[$hash]="$name"
 done
 
 #for key in "${!PROPOSALS[@]}"; do echo "$key --- ${PROPOSALS[$key]}"; done
