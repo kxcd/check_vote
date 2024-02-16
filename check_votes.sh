@@ -71,11 +71,11 @@ for((i=0;i<prop_name_length;i++));do
 done
 echo -e "$header  M A S T E R N O D E S\n"
 for((i=0;i<${#MASTERNODES[@]};i++));do
-#	header+="  $((i+1))"
 	[[ "${TYPES[$i]}" == "Evo" ]]&&header+="  ${bldwht}$((i+1))${txtrst}"||header+="  $((i+1))"
 done
 echo -e "$header"
-for((i=0;i<${#header};i++));do
+header_length=$(echo -e "$header" |sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"|awk '{print length}')
+for((i=0;i<header_length;i++));do
 	spacer+="-"
 done
 echo "$spacer"
